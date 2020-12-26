@@ -2,6 +2,8 @@
 
 ## Interface
 
+timers - manager for multiple timer classes
+
 timers = Timers()
 timers.start(TIMER_LABEL)
 timers.end(TIMER_LABEL)
