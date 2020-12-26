@@ -1165,6 +1165,17 @@ static PyObject *__Pyx_Import(PyObject *name, PyObject *from_list, int level);
 /* ImportFrom.proto */
 static PyObject* __Pyx_ImportFrom(PyObject* module, PyObject* name);
 
+/* SetNameInClass.proto */
+#if CYTHON_COMPILING_IN_CPYTHON && PY_VERSION_HEX >= 0x030500A1
+#define __Pyx_SetNameInClass(ns, name, value)\
+    (likely(PyDict_CheckExact(ns)) ? _PyDict_SetItem_KnownHash(ns, name, value, ((PyASCIIObject *) name)->hash) : PyObject_SetItem(ns, name, value))
+#elif CYTHON_COMPILING_IN_CPYTHON
+#define __Pyx_SetNameInClass(ns, name, value)\
+    (likely(PyDict_CheckExact(ns)) ? PyDict_SetItem(ns, name, value) : PyObject_SetItem(ns, name, value))
+#else
+#define __Pyx_SetNameInClass(ns, name, value)  PyObject_SetItem(ns, name, value)
+#endif
+
 /* FetchCommonType.proto */
 static PyTypeObject* __Pyx_FetchCommonType(PyTypeObject* type);
 
@@ -1227,17 +1238,6 @@ static PyObject *__Pyx_CyFunction_New(PyMethodDef *ml,
                                       PyObject *closure,
                                       PyObject *module, PyObject *globals,
                                       PyObject* code);
-
-/* SetNameInClass.proto */
-#if CYTHON_COMPILING_IN_CPYTHON && PY_VERSION_HEX >= 0x030500A1
-#define __Pyx_SetNameInClass(ns, name, value)\
-    (likely(PyDict_CheckExact(ns)) ? _PyDict_SetItem_KnownHash(ns, name, value, ((PyASCIIObject *) name)->hash) : PyObject_SetItem(ns, name, value))
-#elif CYTHON_COMPILING_IN_CPYTHON
-#define __Pyx_SetNameInClass(ns, name, value)\
-    (likely(PyDict_CheckExact(ns)) ? PyDict_SetItem(ns, name, value) : PyObject_SetItem(ns, name, value))
-#else
-#define __Pyx_SetNameInClass(ns, name, value)  PyObject_SetItem(ns, name, value)
-#endif
 
 /* CalculateMetaclass.proto */
 static PyObject *__Pyx_CalculateMetaclass(PyTypeObject *metaclass, PyObject *bases);
@@ -1329,7 +1329,7 @@ static const char __pyx_k_file[] = "file";
 static const char __pyx_k_init[] = "__init__";
 static const char __pyx_k_main[] = "__main__";
 static const char __pyx_k_mean[] = "mean";
-static const char __pyx_k_name[] = "name";
+static const char __pyx_k_name[] = "__name__";
 static const char __pyx_k_self[] = "self";
 static const char __pyx_k_stop[] = "stop";
 static const char __pyx_k_test[] = "__test__";
@@ -1343,11 +1343,10 @@ static const char __pyx_k_timer[] = "timer";
 static const char __pyx_k_5_high[] = "5% high";
 static const char __pyx_k_Timers[] = "Timers";
 static const char __pyx_k_github[] = "github";
-static const char __pyx_k_header[] = "header";
 static const char __pyx_k_import[] = "__import__";
 static const char __pyx_k_median[] = "median";
 static const char __pyx_k_module[] = "__module__";
-static const char __pyx_k_name_2[] = "__name__";
+static const char __pyx_k_name_2[] = "name";
 static const char __pyx_k_timers[] = "timers";
 static const char __pyx_k_headers[] = "headers";
 static const char __pyx_k_prepare[] = "__prepare__";
@@ -1360,6 +1359,7 @@ static const char __pyx_k_timerData[] = "timerData";
 static const char __pyx_k_printStats[] = "printStats";
 static const char __pyx_k_timers_pyx[] = "timers.pyx";
 static const char __pyx_k_OrderedDict[] = "OrderedDict";
+static const char __pyx_k_STAT_LABELS[] = "STAT_LABELS";
 static const char __pyx_k_Timers_stop[] = "Timers.stop";
 static const char __pyx_k_collections[] = "collections";
 static const char __pyx_k_RuntimeError[] = "RuntimeError";
@@ -1373,6 +1373,7 @@ static PyObject *__pyx_kp_s_5_high;
 static PyObject *__pyx_kp_s_5_low;
 static PyObject *__pyx_n_s_OrderedDict;
 static PyObject *__pyx_n_s_RuntimeError;
+static PyObject *__pyx_n_s_STAT_LABELS;
 static PyObject *__pyx_n_s_Timer;
 static PyObject *__pyx_n_s_Timers;
 static PyObject *__pyx_n_s_Timers___init;
@@ -1388,7 +1389,6 @@ static PyObject *__pyx_n_s_end;
 static PyObject *__pyx_n_s_file;
 static PyObject *__pyx_n_s_getStats;
 static PyObject *__pyx_n_s_github;
-static PyObject *__pyx_n_s_header;
 static PyObject *__pyx_n_s_headers;
 static PyObject *__pyx_n_s_import;
 static PyObject *__pyx_n_s_init;
@@ -1432,8 +1432,8 @@ static PyObject *__pyx_codeobj__6;
 static PyObject *__pyx_codeobj__8;
 /* Late includes */
 
-/* "timers.pyx":7
- * class Timers:
+/* "timers.pyx":17
+ *     ]
  * 
  *     def __init__(self):             # <<<<<<<<<<<<<<
  *         self.timers = OrderedDict()
@@ -1465,14 +1465,14 @@ static PyObject *__pyx_pf_6timers_6Timers___init__(CYTHON_UNUSED PyObject *__pyx
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("__init__", 0);
 
-  /* "timers.pyx":8
+  /* "timers.pyx":18
  * 
  *     def __init__(self):
  *         self.timers = OrderedDict()             # <<<<<<<<<<<<<<
  * 
  *     def start(self,label):
  */
-  __Pyx_GetModuleGlobalName(__pyx_t_2, __pyx_n_s_OrderedDict); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 8, __pyx_L1_error)
+  __Pyx_GetModuleGlobalName(__pyx_t_2, __pyx_n_s_OrderedDict); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 18, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __pyx_t_3 = NULL;
   if (CYTHON_UNPACK_METHODS && unlikely(PyMethod_Check(__pyx_t_2))) {
@@ -1486,14 +1486,14 @@ static PyObject *__pyx_pf_6timers_6Timers___init__(CYTHON_UNUSED PyObject *__pyx
   }
   __pyx_t_1 = (__pyx_t_3) ? __Pyx_PyObject_CallOneArg(__pyx_t_2, __pyx_t_3) : __Pyx_PyObject_CallNoArg(__pyx_t_2);
   __Pyx_XDECREF(__pyx_t_3); __pyx_t_3 = 0;
-  if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 8, __pyx_L1_error)
+  if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 18, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-  if (__Pyx_PyObject_SetAttrStr(__pyx_v_self, __pyx_n_s_timers, __pyx_t_1) < 0) __PYX_ERR(0, 8, __pyx_L1_error)
+  if (__Pyx_PyObject_SetAttrStr(__pyx_v_self, __pyx_n_s_timers, __pyx_t_1) < 0) __PYX_ERR(0, 18, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-  /* "timers.pyx":7
- * class Timers:
+  /* "timers.pyx":17
+ *     ]
  * 
  *     def __init__(self):             # <<<<<<<<<<<<<<
  *         self.timers = OrderedDict()
@@ -1515,7 +1515,7 @@ static PyObject *__pyx_pf_6timers_6Timers___init__(CYTHON_UNUSED PyObject *__pyx
   return __pyx_r;
 }
 
-/* "timers.pyx":10
+/* "timers.pyx":20
  *         self.timers = OrderedDict()
  * 
  *     def start(self,label):             # <<<<<<<<<<<<<<
@@ -1558,11 +1558,11 @@ static PyObject *__pyx_pw_6timers_6Timers_3start(PyObject *__pyx_self, PyObject 
         case  1:
         if (likely((values[1] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_label)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("start", 1, 2, 2, 1); __PYX_ERR(0, 10, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("start", 1, 2, 2, 1); __PYX_ERR(0, 20, __pyx_L3_error)
         }
       }
       if (unlikely(kw_args > 0)) {
-        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "start") < 0)) __PYX_ERR(0, 10, __pyx_L3_error)
+        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "start") < 0)) __PYX_ERR(0, 20, __pyx_L3_error)
       }
     } else if (PyTuple_GET_SIZE(__pyx_args) != 2) {
       goto __pyx_L5_argtuple_error;
@@ -1575,7 +1575,7 @@ static PyObject *__pyx_pw_6timers_6Timers_3start(PyObject *__pyx_self, PyObject 
   }
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L5_argtuple_error:;
-  __Pyx_RaiseArgtupleInvalid("start", 1, 2, 2, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 10, __pyx_L3_error)
+  __Pyx_RaiseArgtupleInvalid("start", 1, 2, 2, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 20, __pyx_L3_error)
   __pyx_L3_error:;
   __Pyx_AddTraceback("timers.Timers.start", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __Pyx_RefNannyFinishContext();
@@ -1601,28 +1601,28 @@ static PyObject *__pyx_pf_6timers_6Timers_2start(CYTHON_UNUSED PyObject *__pyx_s
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("start", 0);
 
-  /* "timers.pyx":11
+  /* "timers.pyx":21
  * 
  *     def start(self,label):
  *         if label not in self.timers:             # <<<<<<<<<<<<<<
  *             self.timers[label] = Timer(label)
  * 
  */
-  __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_timers); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 11, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_timers); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 21, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_2 = (__Pyx_PySequence_ContainsTF(__pyx_v_label, __pyx_t_1, Py_NE)); if (unlikely(__pyx_t_2 < 0)) __PYX_ERR(0, 11, __pyx_L1_error)
+  __pyx_t_2 = (__Pyx_PySequence_ContainsTF(__pyx_v_label, __pyx_t_1, Py_NE)); if (unlikely(__pyx_t_2 < 0)) __PYX_ERR(0, 21, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   __pyx_t_3 = (__pyx_t_2 != 0);
   if (__pyx_t_3) {
 
-    /* "timers.pyx":12
+    /* "timers.pyx":22
  *     def start(self,label):
  *         if label not in self.timers:
  *             self.timers[label] = Timer(label)             # <<<<<<<<<<<<<<
  * 
  *         self.timers[label].start()
  */
-    __Pyx_GetModuleGlobalName(__pyx_t_4, __pyx_n_s_Timer); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 12, __pyx_L1_error)
+    __Pyx_GetModuleGlobalName(__pyx_t_4, __pyx_n_s_Timer); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 22, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_4);
     __pyx_t_5 = NULL;
     if (CYTHON_UNPACK_METHODS && unlikely(PyMethod_Check(__pyx_t_4))) {
@@ -1636,16 +1636,16 @@ static PyObject *__pyx_pf_6timers_6Timers_2start(CYTHON_UNUSED PyObject *__pyx_s
     }
     __pyx_t_1 = (__pyx_t_5) ? __Pyx_PyObject_Call2Args(__pyx_t_4, __pyx_t_5, __pyx_v_label) : __Pyx_PyObject_CallOneArg(__pyx_t_4, __pyx_v_label);
     __Pyx_XDECREF(__pyx_t_5); __pyx_t_5 = 0;
-    if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 12, __pyx_L1_error)
+    if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 22, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
     __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-    __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_timers); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 12, __pyx_L1_error)
+    __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_timers); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 22, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_4);
-    if (unlikely(PyObject_SetItem(__pyx_t_4, __pyx_v_label, __pyx_t_1) < 0)) __PYX_ERR(0, 12, __pyx_L1_error)
+    if (unlikely(PyObject_SetItem(__pyx_t_4, __pyx_v_label, __pyx_t_1) < 0)) __PYX_ERR(0, 22, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-    /* "timers.pyx":11
+    /* "timers.pyx":21
  * 
  *     def start(self,label):
  *         if label not in self.timers:             # <<<<<<<<<<<<<<
@@ -1654,19 +1654,19 @@ static PyObject *__pyx_pf_6timers_6Timers_2start(CYTHON_UNUSED PyObject *__pyx_s
  */
   }
 
-  /* "timers.pyx":14
+  /* "timers.pyx":24
  *             self.timers[label] = Timer(label)
  * 
  *         self.timers[label].start()             # <<<<<<<<<<<<<<
  * 
  *     def stop(self,label):
  */
-  __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_timers); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 14, __pyx_L1_error)
+  __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_timers); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 24, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_4);
-  __pyx_t_5 = __Pyx_PyObject_GetItem(__pyx_t_4, __pyx_v_label); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 14, __pyx_L1_error)
+  __pyx_t_5 = __Pyx_PyObject_GetItem(__pyx_t_4, __pyx_v_label); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 24, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_5);
   __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-  __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_t_5, __pyx_n_s_start); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 14, __pyx_L1_error)
+  __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_t_5, __pyx_n_s_start); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 24, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_4);
   __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
   __pyx_t_5 = NULL;
@@ -1681,12 +1681,12 @@ static PyObject *__pyx_pf_6timers_6Timers_2start(CYTHON_UNUSED PyObject *__pyx_s
   }
   __pyx_t_1 = (__pyx_t_5) ? __Pyx_PyObject_CallOneArg(__pyx_t_4, __pyx_t_5) : __Pyx_PyObject_CallNoArg(__pyx_t_4);
   __Pyx_XDECREF(__pyx_t_5); __pyx_t_5 = 0;
-  if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 14, __pyx_L1_error)
+  if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 24, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-  /* "timers.pyx":10
+  /* "timers.pyx":20
  *         self.timers = OrderedDict()
  * 
  *     def start(self,label):             # <<<<<<<<<<<<<<
@@ -1709,7 +1709,7 @@ static PyObject *__pyx_pf_6timers_6Timers_2start(CYTHON_UNUSED PyObject *__pyx_s
   return __pyx_r;
 }
 
-/* "timers.pyx":16
+/* "timers.pyx":26
  *         self.timers[label].start()
  * 
  *     def stop(self,label):             # <<<<<<<<<<<<<<
@@ -1752,11 +1752,11 @@ static PyObject *__pyx_pw_6timers_6Timers_5stop(PyObject *__pyx_self, PyObject *
         case  1:
         if (likely((values[1] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_label)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("stop", 1, 2, 2, 1); __PYX_ERR(0, 16, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("stop", 1, 2, 2, 1); __PYX_ERR(0, 26, __pyx_L3_error)
         }
       }
       if (unlikely(kw_args > 0)) {
-        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "stop") < 0)) __PYX_ERR(0, 16, __pyx_L3_error)
+        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "stop") < 0)) __PYX_ERR(0, 26, __pyx_L3_error)
       }
     } else if (PyTuple_GET_SIZE(__pyx_args) != 2) {
       goto __pyx_L5_argtuple_error;
@@ -1769,7 +1769,7 @@ static PyObject *__pyx_pw_6timers_6Timers_5stop(PyObject *__pyx_self, PyObject *
   }
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L5_argtuple_error:;
-  __Pyx_RaiseArgtupleInvalid("stop", 1, 2, 2, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 16, __pyx_L3_error)
+  __Pyx_RaiseArgtupleInvalid("stop", 1, 2, 2, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 26, __pyx_L3_error)
   __pyx_L3_error:;
   __Pyx_AddTraceback("timers.Timers.stop", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __Pyx_RefNannyFinishContext();
@@ -1797,28 +1797,28 @@ static PyObject *__pyx_pf_6timers_6Timers_4stop(CYTHON_UNUSED PyObject *__pyx_se
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("stop", 0);
 
-  /* "timers.pyx":17
+  /* "timers.pyx":27
  * 
  *     def stop(self,label):
  *         if label not in self.timers:             # <<<<<<<<<<<<<<
  *             raise RuntimeError(
  *                 f'timer with label {label} does not exist'
  */
-  __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_timers); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 17, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_timers); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 27, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_2 = (__Pyx_PySequence_ContainsTF(__pyx_v_label, __pyx_t_1, Py_NE)); if (unlikely(__pyx_t_2 < 0)) __PYX_ERR(0, 17, __pyx_L1_error)
+  __pyx_t_2 = (__Pyx_PySequence_ContainsTF(__pyx_v_label, __pyx_t_1, Py_NE)); if (unlikely(__pyx_t_2 < 0)) __PYX_ERR(0, 27, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   __pyx_t_3 = (__pyx_t_2 != 0);
   if (unlikely(__pyx_t_3)) {
 
-    /* "timers.pyx":19
+    /* "timers.pyx":29
  *         if label not in self.timers:
  *             raise RuntimeError(
  *                 f'timer with label {label} does not exist'             # <<<<<<<<<<<<<<
  *             )
  * 
  */
-    __pyx_t_1 = PyTuple_New(3); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 19, __pyx_L1_error)
+    __pyx_t_1 = PyTuple_New(3); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 29, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
     __pyx_t_4 = 0;
     __pyx_t_5 = 127;
@@ -1826,7 +1826,7 @@ static PyObject *__pyx_pf_6timers_6Timers_4stop(CYTHON_UNUSED PyObject *__pyx_se
     __pyx_t_4 += 17;
     __Pyx_GIVEREF(__pyx_kp_u_timer_with_label);
     PyTuple_SET_ITEM(__pyx_t_1, 0, __pyx_kp_u_timer_with_label);
-    __pyx_t_6 = __Pyx_PyObject_FormatSimple(__pyx_v_label, __pyx_empty_unicode); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 19, __pyx_L1_error)
+    __pyx_t_6 = __Pyx_PyObject_FormatSimple(__pyx_v_label, __pyx_empty_unicode); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 29, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_6);
     __pyx_t_5 = (__Pyx_PyUnicode_MAX_CHAR_VALUE(__pyx_t_6) > __pyx_t_5) ? __Pyx_PyUnicode_MAX_CHAR_VALUE(__pyx_t_6) : __pyx_t_5;
     __pyx_t_4 += __Pyx_PyUnicode_GET_LENGTH(__pyx_t_6);
@@ -1837,25 +1837,25 @@ static PyObject *__pyx_pf_6timers_6Timers_4stop(CYTHON_UNUSED PyObject *__pyx_se
     __pyx_t_4 += 15;
     __Pyx_GIVEREF(__pyx_kp_u_does_not_exist);
     PyTuple_SET_ITEM(__pyx_t_1, 2, __pyx_kp_u_does_not_exist);
-    __pyx_t_6 = __Pyx_PyUnicode_Join(__pyx_t_1, 3, __pyx_t_4, __pyx_t_5); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 19, __pyx_L1_error)
+    __pyx_t_6 = __Pyx_PyUnicode_Join(__pyx_t_1, 3, __pyx_t_4, __pyx_t_5); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 29, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_6);
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-    /* "timers.pyx":18
+    /* "timers.pyx":28
  *     def stop(self,label):
  *         if label not in self.timers:
  *             raise RuntimeError(             # <<<<<<<<<<<<<<
  *                 f'timer with label {label} does not exist'
  *             )
  */
-    __pyx_t_1 = __Pyx_PyObject_CallOneArg(__pyx_builtin_RuntimeError, __pyx_t_6); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 18, __pyx_L1_error)
+    __pyx_t_1 = __Pyx_PyObject_CallOneArg(__pyx_builtin_RuntimeError, __pyx_t_6); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 28, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
     __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
     __Pyx_Raise(__pyx_t_1, 0, 0, 0);
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-    __PYX_ERR(0, 18, __pyx_L1_error)
+    __PYX_ERR(0, 28, __pyx_L1_error)
 
-    /* "timers.pyx":17
+    /* "timers.pyx":27
  * 
  *     def stop(self,label):
  *         if label not in self.timers:             # <<<<<<<<<<<<<<
@@ -1864,19 +1864,19 @@ static PyObject *__pyx_pf_6timers_6Timers_4stop(CYTHON_UNUSED PyObject *__pyx_se
  */
   }
 
-  /* "timers.pyx":22
+  /* "timers.pyx":32
  *             )
  * 
  *         self.timers[label].stop()             # <<<<<<<<<<<<<<
  * 
  *     def printStats(self):
  */
-  __pyx_t_6 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_timers); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 22, __pyx_L1_error)
+  __pyx_t_6 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_timers); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 32, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_6);
-  __pyx_t_7 = __Pyx_PyObject_GetItem(__pyx_t_6, __pyx_v_label); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 22, __pyx_L1_error)
+  __pyx_t_7 = __Pyx_PyObject_GetItem(__pyx_t_6, __pyx_v_label); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 32, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_7);
   __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
-  __pyx_t_6 = __Pyx_PyObject_GetAttrStr(__pyx_t_7, __pyx_n_s_stop); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 22, __pyx_L1_error)
+  __pyx_t_6 = __Pyx_PyObject_GetAttrStr(__pyx_t_7, __pyx_n_s_stop); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 32, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_6);
   __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
   __pyx_t_7 = NULL;
@@ -1891,12 +1891,12 @@ static PyObject *__pyx_pf_6timers_6Timers_4stop(CYTHON_UNUSED PyObject *__pyx_se
   }
   __pyx_t_1 = (__pyx_t_7) ? __Pyx_PyObject_CallOneArg(__pyx_t_6, __pyx_t_7) : __Pyx_PyObject_CallNoArg(__pyx_t_6);
   __Pyx_XDECREF(__pyx_t_7); __pyx_t_7 = 0;
-  if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 22, __pyx_L1_error)
+  if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 32, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-  /* "timers.pyx":16
+  /* "timers.pyx":26
  *         self.timers[label].start()
  * 
  *     def stop(self,label):             # <<<<<<<<<<<<<<
@@ -1919,12 +1919,12 @@ static PyObject *__pyx_pf_6timers_6Timers_4stop(CYTHON_UNUSED PyObject *__pyx_se
   return __pyx_r;
 }
 
-/* "timers.pyx":24
+/* "timers.pyx":34
  *         self.timers[label].stop()
  * 
  *     def printStats(self):             # <<<<<<<<<<<<<<
  *         # collect data
- *         header = [
+ *         data = []
  */
 
 /* Python wrapper */
@@ -1942,7 +1942,6 @@ static PyObject *__pyx_pw_6timers_6Timers_7printStats(PyObject *__pyx_self, PyOb
 }
 
 static PyObject *__pyx_pf_6timers_6Timers_6printStats(CYTHON_UNUSED PyObject *__pyx_self, PyObject *__pyx_v_self) {
-  PyObject *__pyx_v_header = NULL;
   PyObject *__pyx_v_data = NULL;
   PyObject *__pyx_v_label = NULL;
   PyObject *__pyx_v_timer = NULL;
@@ -1963,61 +1962,28 @@ static PyObject *__pyx_pf_6timers_6Timers_6printStats(CYTHON_UNUSED PyObject *__
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("printStats", 0);
 
-  /* "timers.pyx":26
+  /* "timers.pyx":36
  *     def printStats(self):
  *         # collect data
- *         header = [             # <<<<<<<<<<<<<<
- *             'name',
- *             'mean',
- */
-  __pyx_t_1 = PyList_New(7); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 26, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_1);
-  __Pyx_INCREF(__pyx_n_s_name);
-  __Pyx_GIVEREF(__pyx_n_s_name);
-  PyList_SET_ITEM(__pyx_t_1, 0, __pyx_n_s_name);
-  __Pyx_INCREF(__pyx_n_s_mean);
-  __Pyx_GIVEREF(__pyx_n_s_mean);
-  PyList_SET_ITEM(__pyx_t_1, 1, __pyx_n_s_mean);
-  __Pyx_INCREF(__pyx_n_s_median);
-  __Pyx_GIVEREF(__pyx_n_s_median);
-  PyList_SET_ITEM(__pyx_t_1, 2, __pyx_n_s_median);
-  __Pyx_INCREF(__pyx_n_s_min);
-  __Pyx_GIVEREF(__pyx_n_s_min);
-  PyList_SET_ITEM(__pyx_t_1, 3, __pyx_n_s_min);
-  __Pyx_INCREF(__pyx_n_s_max);
-  __Pyx_GIVEREF(__pyx_n_s_max);
-  PyList_SET_ITEM(__pyx_t_1, 4, __pyx_n_s_max);
-  __Pyx_INCREF(__pyx_kp_s_5_low);
-  __Pyx_GIVEREF(__pyx_kp_s_5_low);
-  PyList_SET_ITEM(__pyx_t_1, 5, __pyx_kp_s_5_low);
-  __Pyx_INCREF(__pyx_kp_s_5_high);
-  __Pyx_GIVEREF(__pyx_kp_s_5_high);
-  PyList_SET_ITEM(__pyx_t_1, 6, __pyx_kp_s_5_high);
-  __pyx_v_header = ((PyObject*)__pyx_t_1);
-  __pyx_t_1 = 0;
-
-  /* "timers.pyx":35
- *             '5% high'
- *         ]
  *         data = []             # <<<<<<<<<<<<<<
  *         for label,timer in self.timers.items():
  *             timerData = [label] + list(timer.getStats())
  */
-  __pyx_t_1 = PyList_New(0); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 35, __pyx_L1_error)
+  __pyx_t_1 = PyList_New(0); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 36, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __pyx_v_data = ((PyObject*)__pyx_t_1);
   __pyx_t_1 = 0;
 
-  /* "timers.pyx":36
- *         ]
+  /* "timers.pyx":37
+ *         # collect data
  *         data = []
  *         for label,timer in self.timers.items():             # <<<<<<<<<<<<<<
  *             timerData = [label] + list(timer.getStats())
  *             data.append(timerData)
  */
-  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_timers); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 36, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_timers); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 37, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
-  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_items); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 36, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_items); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 37, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   __pyx_t_2 = NULL;
@@ -2032,16 +1998,16 @@ static PyObject *__pyx_pf_6timers_6Timers_6printStats(CYTHON_UNUSED PyObject *__
   }
   __pyx_t_1 = (__pyx_t_2) ? __Pyx_PyObject_CallOneArg(__pyx_t_3, __pyx_t_2) : __Pyx_PyObject_CallNoArg(__pyx_t_3);
   __Pyx_XDECREF(__pyx_t_2); __pyx_t_2 = 0;
-  if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 36, __pyx_L1_error)
+  if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 37, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
   if (likely(PyList_CheckExact(__pyx_t_1)) || PyTuple_CheckExact(__pyx_t_1)) {
     __pyx_t_3 = __pyx_t_1; __Pyx_INCREF(__pyx_t_3); __pyx_t_4 = 0;
     __pyx_t_5 = NULL;
   } else {
-    __pyx_t_4 = -1; __pyx_t_3 = PyObject_GetIter(__pyx_t_1); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 36, __pyx_L1_error)
+    __pyx_t_4 = -1; __pyx_t_3 = PyObject_GetIter(__pyx_t_1); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 37, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_3);
-    __pyx_t_5 = Py_TYPE(__pyx_t_3)->tp_iternext; if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 36, __pyx_L1_error)
+    __pyx_t_5 = Py_TYPE(__pyx_t_3)->tp_iternext; if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 37, __pyx_L1_error)
   }
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   for (;;) {
@@ -2049,17 +2015,17 @@ static PyObject *__pyx_pf_6timers_6Timers_6printStats(CYTHON_UNUSED PyObject *__
       if (likely(PyList_CheckExact(__pyx_t_3))) {
         if (__pyx_t_4 >= PyList_GET_SIZE(__pyx_t_3)) break;
         #if CYTHON_ASSUME_SAFE_MACROS && !CYTHON_AVOID_BORROWED_REFS
-        __pyx_t_1 = PyList_GET_ITEM(__pyx_t_3, __pyx_t_4); __Pyx_INCREF(__pyx_t_1); __pyx_t_4++; if (unlikely(0 < 0)) __PYX_ERR(0, 36, __pyx_L1_error)
+        __pyx_t_1 = PyList_GET_ITEM(__pyx_t_3, __pyx_t_4); __Pyx_INCREF(__pyx_t_1); __pyx_t_4++; if (unlikely(0 < 0)) __PYX_ERR(0, 37, __pyx_L1_error)
         #else
-        __pyx_t_1 = PySequence_ITEM(__pyx_t_3, __pyx_t_4); __pyx_t_4++; if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 36, __pyx_L1_error)
+        __pyx_t_1 = PySequence_ITEM(__pyx_t_3, __pyx_t_4); __pyx_t_4++; if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 37, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_1);
         #endif
       } else {
         if (__pyx_t_4 >= PyTuple_GET_SIZE(__pyx_t_3)) break;
         #if CYTHON_ASSUME_SAFE_MACROS && !CYTHON_AVOID_BORROWED_REFS
-        __pyx_t_1 = PyTuple_GET_ITEM(__pyx_t_3, __pyx_t_4); __Pyx_INCREF(__pyx_t_1); __pyx_t_4++; if (unlikely(0 < 0)) __PYX_ERR(0, 36, __pyx_L1_error)
+        __pyx_t_1 = PyTuple_GET_ITEM(__pyx_t_3, __pyx_t_4); __Pyx_INCREF(__pyx_t_1); __pyx_t_4++; if (unlikely(0 < 0)) __PYX_ERR(0, 37, __pyx_L1_error)
         #else
-        __pyx_t_1 = PySequence_ITEM(__pyx_t_3, __pyx_t_4); __pyx_t_4++; if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 36, __pyx_L1_error)
+        __pyx_t_1 = PySequence_ITEM(__pyx_t_3, __pyx_t_4); __pyx_t_4++; if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 37, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_1);
         #endif
       }
@@ -2069,7 +2035,7 @@ static PyObject *__pyx_pf_6timers_6Timers_6printStats(CYTHON_UNUSED PyObject *__
         PyObject* exc_type = PyErr_Occurred();
         if (exc_type) {
           if (likely(__Pyx_PyErr_GivenExceptionMatches(exc_type, PyExc_StopIteration))) PyErr_Clear();
-          else __PYX_ERR(0, 36, __pyx_L1_error)
+          else __PYX_ERR(0, 37, __pyx_L1_error)
         }
         break;
       }
@@ -2081,7 +2047,7 @@ static PyObject *__pyx_pf_6timers_6Timers_6printStats(CYTHON_UNUSED PyObject *__
       if (unlikely(size != 2)) {
         if (size > 2) __Pyx_RaiseTooManyValuesError(2);
         else if (size >= 0) __Pyx_RaiseNeedMoreValuesError(size);
-        __PYX_ERR(0, 36, __pyx_L1_error)
+        __PYX_ERR(0, 37, __pyx_L1_error)
       }
       #if CYTHON_ASSUME_SAFE_MACROS && !CYTHON_AVOID_BORROWED_REFS
       if (likely(PyTuple_CheckExact(sequence))) {
@@ -2094,15 +2060,15 @@ static PyObject *__pyx_pf_6timers_6Timers_6printStats(CYTHON_UNUSED PyObject *__
       __Pyx_INCREF(__pyx_t_2);
       __Pyx_INCREF(__pyx_t_6);
       #else
-      __pyx_t_2 = PySequence_ITEM(sequence, 0); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 36, __pyx_L1_error)
+      __pyx_t_2 = PySequence_ITEM(sequence, 0); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 37, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_2);
-      __pyx_t_6 = PySequence_ITEM(sequence, 1); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 36, __pyx_L1_error)
+      __pyx_t_6 = PySequence_ITEM(sequence, 1); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 37, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_6);
       #endif
       __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
     } else {
       Py_ssize_t index = -1;
-      __pyx_t_7 = PyObject_GetIter(__pyx_t_1); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 36, __pyx_L1_error)
+      __pyx_t_7 = PyObject_GetIter(__pyx_t_1); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 37, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_7);
       __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
       __pyx_t_8 = Py_TYPE(__pyx_t_7)->tp_iternext;
@@ -2110,7 +2076,7 @@ static PyObject *__pyx_pf_6timers_6Timers_6printStats(CYTHON_UNUSED PyObject *__
       __Pyx_GOTREF(__pyx_t_2);
       index = 1; __pyx_t_6 = __pyx_t_8(__pyx_t_7); if (unlikely(!__pyx_t_6)) goto __pyx_L5_unpacking_failed;
       __Pyx_GOTREF(__pyx_t_6);
-      if (__Pyx_IternextUnpackEndCheck(__pyx_t_8(__pyx_t_7), 2) < 0) __PYX_ERR(0, 36, __pyx_L1_error)
+      if (__Pyx_IternextUnpackEndCheck(__pyx_t_8(__pyx_t_7), 2) < 0) __PYX_ERR(0, 37, __pyx_L1_error)
       __pyx_t_8 = NULL;
       __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
       goto __pyx_L6_unpacking_done;
@@ -2118,7 +2084,7 @@ static PyObject *__pyx_pf_6timers_6Timers_6printStats(CYTHON_UNUSED PyObject *__
       __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
       __pyx_t_8 = NULL;
       if (__Pyx_IterFinish() == 0) __Pyx_RaiseNeedMoreValuesError(index);
-      __PYX_ERR(0, 36, __pyx_L1_error)
+      __PYX_ERR(0, 37, __pyx_L1_error)
       __pyx_L6_unpacking_done:;
     }
     __Pyx_XDECREF_SET(__pyx_v_label, __pyx_t_2);
@@ -2126,19 +2092,19 @@ static PyObject *__pyx_pf_6timers_6Timers_6printStats(CYTHON_UNUSED PyObject *__
     __Pyx_XDECREF_SET(__pyx_v_timer, __pyx_t_6);
     __pyx_t_6 = 0;
 
-    /* "timers.pyx":37
+    /* "timers.pyx":38
  *         data = []
  *         for label,timer in self.timers.items():
  *             timerData = [label] + list(timer.getStats())             # <<<<<<<<<<<<<<
  *             data.append(timerData)
  * 
  */
-    __pyx_t_1 = PyList_New(1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 37, __pyx_L1_error)
+    __pyx_t_1 = PyList_New(1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 38, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
     __Pyx_INCREF(__pyx_v_label);
     __Pyx_GIVEREF(__pyx_v_label);
     PyList_SET_ITEM(__pyx_t_1, 0, __pyx_v_label);
-    __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_timer, __pyx_n_s_getStats); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 37, __pyx_L1_error)
+    __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_timer, __pyx_n_s_getStats); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 38, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
     __pyx_t_7 = NULL;
     if (CYTHON_UNPACK_METHODS && likely(PyMethod_Check(__pyx_t_2))) {
@@ -2152,30 +2118,30 @@ static PyObject *__pyx_pf_6timers_6Timers_6printStats(CYTHON_UNUSED PyObject *__
     }
     __pyx_t_6 = (__pyx_t_7) ? __Pyx_PyObject_CallOneArg(__pyx_t_2, __pyx_t_7) : __Pyx_PyObject_CallNoArg(__pyx_t_2);
     __Pyx_XDECREF(__pyx_t_7); __pyx_t_7 = 0;
-    if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 37, __pyx_L1_error)
+    if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 38, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_6);
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-    __pyx_t_2 = PySequence_List(__pyx_t_6); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 37, __pyx_L1_error)
+    __pyx_t_2 = PySequence_List(__pyx_t_6); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 38, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
     __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
-    __pyx_t_6 = PyNumber_Add(__pyx_t_1, __pyx_t_2); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 37, __pyx_L1_error)
+    __pyx_t_6 = PyNumber_Add(__pyx_t_1, __pyx_t_2); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 38, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_6);
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
     __Pyx_XDECREF_SET(__pyx_v_timerData, ((PyObject*)__pyx_t_6));
     __pyx_t_6 = 0;
 
-    /* "timers.pyx":38
+    /* "timers.pyx":39
  *         for label,timer in self.timers.items():
  *             timerData = [label] + list(timer.getStats())
  *             data.append(timerData)             # <<<<<<<<<<<<<<
  * 
  *         # !! praise the tabulate library author !!
  */
-    __pyx_t_9 = __Pyx_PyList_Append(__pyx_v_data, __pyx_v_timerData); if (unlikely(__pyx_t_9 == ((int)-1))) __PYX_ERR(0, 38, __pyx_L1_error)
+    __pyx_t_9 = __Pyx_PyList_Append(__pyx_v_data, __pyx_v_timerData); if (unlikely(__pyx_t_9 == ((int)-1))) __PYX_ERR(0, 39, __pyx_L1_error)
 
-    /* "timers.pyx":36
- *         ]
+    /* "timers.pyx":37
+ *         # collect data
  *         data = []
  *         for label,timer in self.timers.items():             # <<<<<<<<<<<<<<
  *             timerData = [label] + list(timer.getStats())
@@ -2184,37 +2150,43 @@ static PyObject *__pyx_pf_6timers_6Timers_6printStats(CYTHON_UNUSED PyObject *__
   }
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
 
-  /* "timers.pyx":41
+  /* "timers.pyx":42
  * 
  *         # !! praise the tabulate library author !!
- *         print(tabulate(data,headers=header,tablefmt='github'))             # <<<<<<<<<<<<<<
+ *         print(tabulate(data,headers=Timers.STAT_LABELS,tablefmt='github'))             # <<<<<<<<<<<<<<
  * 
  */
-  __Pyx_GetModuleGlobalName(__pyx_t_3, __pyx_n_s_tabulate); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 41, __pyx_L1_error)
+  __Pyx_GetModuleGlobalName(__pyx_t_3, __pyx_n_s_tabulate); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 42, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
-  __pyx_t_6 = PyTuple_New(1); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 41, __pyx_L1_error)
+  __pyx_t_6 = PyTuple_New(1); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 42, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_6);
   __Pyx_INCREF(__pyx_v_data);
   __Pyx_GIVEREF(__pyx_v_data);
   PyTuple_SET_ITEM(__pyx_t_6, 0, __pyx_v_data);
-  __pyx_t_2 = __Pyx_PyDict_NewPresized(2); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 41, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyDict_NewPresized(2); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 42, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
-  if (PyDict_SetItem(__pyx_t_2, __pyx_n_s_headers, __pyx_v_header) < 0) __PYX_ERR(0, 41, __pyx_L1_error)
-  if (PyDict_SetItem(__pyx_t_2, __pyx_n_s_tablefmt, __pyx_n_s_github) < 0) __PYX_ERR(0, 41, __pyx_L1_error)
-  __pyx_t_1 = __Pyx_PyObject_Call(__pyx_t_3, __pyx_t_6, __pyx_t_2); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 41, __pyx_L1_error)
+  __Pyx_GetModuleGlobalName(__pyx_t_1, __pyx_n_s_Timers); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 42, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
+  __pyx_t_7 = __Pyx_PyObject_GetAttrStr(__pyx_t_1, __pyx_n_s_STAT_LABELS); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 42, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_7);
+  __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+  if (PyDict_SetItem(__pyx_t_2, __pyx_n_s_headers, __pyx_t_7) < 0) __PYX_ERR(0, 42, __pyx_L1_error)
+  __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
+  if (PyDict_SetItem(__pyx_t_2, __pyx_n_s_tablefmt, __pyx_n_s_github) < 0) __PYX_ERR(0, 42, __pyx_L1_error)
+  __pyx_t_7 = __Pyx_PyObject_Call(__pyx_t_3, __pyx_t_6, __pyx_t_2); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 42, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_7);
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
   __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-  if (__Pyx_PrintOne(0, __pyx_t_1) < 0) __PYX_ERR(0, 41, __pyx_L1_error)
-  __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+  if (__Pyx_PrintOne(0, __pyx_t_7) < 0) __PYX_ERR(0, 42, __pyx_L1_error)
+  __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
 
-  /* "timers.pyx":24
+  /* "timers.pyx":34
  *         self.timers[label].stop()
  * 
  *     def printStats(self):             # <<<<<<<<<<<<<<
  *         # collect data
- *         header = [
+ *         data = []
  */
 
   /* function exit code */
@@ -2229,7 +2201,6 @@ static PyObject *__pyx_pf_6timers_6Timers_6printStats(CYTHON_UNUSED PyObject *__
   __Pyx_AddTraceback("timers.Timers.printStats", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __pyx_r = NULL;
   __pyx_L0:;
-  __Pyx_XDECREF(__pyx_v_header);
   __Pyx_XDECREF(__pyx_v_data);
   __Pyx_XDECREF(__pyx_v_label);
   __Pyx_XDECREF(__pyx_v_timer);
@@ -2289,6 +2260,7 @@ static __Pyx_StringTabEntry __pyx_string_tab[] = {
   {&__pyx_kp_s_5_low, __pyx_k_5_low, sizeof(__pyx_k_5_low), 0, 0, 1, 0},
   {&__pyx_n_s_OrderedDict, __pyx_k_OrderedDict, sizeof(__pyx_k_OrderedDict), 0, 0, 1, 1},
   {&__pyx_n_s_RuntimeError, __pyx_k_RuntimeError, sizeof(__pyx_k_RuntimeError), 0, 0, 1, 1},
+  {&__pyx_n_s_STAT_LABELS, __pyx_k_STAT_LABELS, sizeof(__pyx_k_STAT_LABELS), 0, 0, 1, 1},
   {&__pyx_n_s_Timer, __pyx_k_Timer, sizeof(__pyx_k_Timer), 0, 0, 1, 1},
   {&__pyx_n_s_Timers, __pyx_k_Timers, sizeof(__pyx_k_Timers), 0, 0, 1, 1},
   {&__pyx_n_s_Timers___init, __pyx_k_Timers___init, sizeof(__pyx_k_Timers___init), 0, 0, 1, 1},
@@ -2304,7 +2276,6 @@ static __Pyx_StringTabEntry __pyx_string_tab[] = {
   {&__pyx_n_s_file, __pyx_k_file, sizeof(__pyx_k_file), 0, 0, 1, 1},
   {&__pyx_n_s_getStats, __pyx_k_getStats, sizeof(__pyx_k_getStats), 0, 0, 1, 1},
   {&__pyx_n_s_github, __pyx_k_github, sizeof(__pyx_k_github), 0, 0, 1, 1},
-  {&__pyx_n_s_header, __pyx_k_header, sizeof(__pyx_k_header), 0, 0, 1, 1},
   {&__pyx_n_s_headers, __pyx_k_headers, sizeof(__pyx_k_headers), 0, 0, 1, 1},
   {&__pyx_n_s_import, __pyx_k_import, sizeof(__pyx_k_import), 0, 0, 1, 1},
   {&__pyx_n_s_init, __pyx_k_init, sizeof(__pyx_k_init), 0, 0, 1, 1},
@@ -2337,7 +2308,7 @@ static __Pyx_StringTabEntry __pyx_string_tab[] = {
   {0, 0, 0, 0, 0, 0, 0}
 };
 static CYTHON_SMALL_CODE int __Pyx_InitCachedBuiltins(void) {
-  __pyx_builtin_RuntimeError = __Pyx_GetBuiltinName(__pyx_n_s_RuntimeError); if (!__pyx_builtin_RuntimeError) __PYX_ERR(0, 18, __pyx_L1_error)
+  __pyx_builtin_RuntimeError = __Pyx_GetBuiltinName(__pyx_n_s_RuntimeError); if (!__pyx_builtin_RuntimeError) __PYX_ERR(0, 28, __pyx_L1_error)
   return 0;
   __pyx_L1_error:;
   return -1;
@@ -2347,53 +2318,53 @@ static CYTHON_SMALL_CODE int __Pyx_InitCachedConstants(void) {
   __Pyx_RefNannyDeclarations
   __Pyx_RefNannySetupContext("__Pyx_InitCachedConstants", 0);
 
-  /* "timers.pyx":7
- * class Timers:
+  /* "timers.pyx":17
+ *     ]
  * 
  *     def __init__(self):             # <<<<<<<<<<<<<<
  *         self.timers = OrderedDict()
  * 
  */
-  __pyx_tuple_ = PyTuple_Pack(1, __pyx_n_s_self); if (unlikely(!__pyx_tuple_)) __PYX_ERR(0, 7, __pyx_L1_error)
+  __pyx_tuple_ = PyTuple_Pack(1, __pyx_n_s_self); if (unlikely(!__pyx_tuple_)) __PYX_ERR(0, 17, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple_);
   __Pyx_GIVEREF(__pyx_tuple_);
-  __pyx_codeobj__2 = (PyObject*)__Pyx_PyCode_New(1, 0, 1, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple_, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_timers_pyx, __pyx_n_s_init, 7, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__2)) __PYX_ERR(0, 7, __pyx_L1_error)
+  __pyx_codeobj__2 = (PyObject*)__Pyx_PyCode_New(1, 0, 1, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple_, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_timers_pyx, __pyx_n_s_init, 17, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__2)) __PYX_ERR(0, 17, __pyx_L1_error)
 
-  /* "timers.pyx":10
+  /* "timers.pyx":20
  *         self.timers = OrderedDict()
  * 
  *     def start(self,label):             # <<<<<<<<<<<<<<
  *         if label not in self.timers:
  *             self.timers[label] = Timer(label)
  */
-  __pyx_tuple__3 = PyTuple_Pack(2, __pyx_n_s_self, __pyx_n_s_label); if (unlikely(!__pyx_tuple__3)) __PYX_ERR(0, 10, __pyx_L1_error)
+  __pyx_tuple__3 = PyTuple_Pack(2, __pyx_n_s_self, __pyx_n_s_label); if (unlikely(!__pyx_tuple__3)) __PYX_ERR(0, 20, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple__3);
   __Pyx_GIVEREF(__pyx_tuple__3);
-  __pyx_codeobj__4 = (PyObject*)__Pyx_PyCode_New(2, 0, 2, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__3, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_timers_pyx, __pyx_n_s_start, 10, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__4)) __PYX_ERR(0, 10, __pyx_L1_error)
+  __pyx_codeobj__4 = (PyObject*)__Pyx_PyCode_New(2, 0, 2, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__3, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_timers_pyx, __pyx_n_s_start, 20, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__4)) __PYX_ERR(0, 20, __pyx_L1_error)
 
-  /* "timers.pyx":16
+  /* "timers.pyx":26
  *         self.timers[label].start()
  * 
  *     def stop(self,label):             # <<<<<<<<<<<<<<
  *         if label not in self.timers:
  *             raise RuntimeError(
  */
-  __pyx_tuple__5 = PyTuple_Pack(2, __pyx_n_s_self, __pyx_n_s_label); if (unlikely(!__pyx_tuple__5)) __PYX_ERR(0, 16, __pyx_L1_error)
+  __pyx_tuple__5 = PyTuple_Pack(2, __pyx_n_s_self, __pyx_n_s_label); if (unlikely(!__pyx_tuple__5)) __PYX_ERR(0, 26, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple__5);
   __Pyx_GIVEREF(__pyx_tuple__5);
-  __pyx_codeobj__6 = (PyObject*)__Pyx_PyCode_New(2, 0, 2, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__5, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_timers_pyx, __pyx_n_s_stop, 16, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__6)) __PYX_ERR(0, 16, __pyx_L1_error)
+  __pyx_codeobj__6 = (PyObject*)__Pyx_PyCode_New(2, 0, 2, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__5, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_timers_pyx, __pyx_n_s_stop, 26, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__6)) __PYX_ERR(0, 26, __pyx_L1_error)
 
-  /* "timers.pyx":24
+  /* "timers.pyx":34
  *         self.timers[label].stop()
  * 
  *     def printStats(self):             # <<<<<<<<<<<<<<
  *         # collect data
- *         header = [
+ *         data = []
  */
-  __pyx_tuple__7 = PyTuple_Pack(6, __pyx_n_s_self, __pyx_n_s_header, __pyx_n_s_data, __pyx_n_s_label, __pyx_n_s_timer, __pyx_n_s_timerData); if (unlikely(!__pyx_tuple__7)) __PYX_ERR(0, 24, __pyx_L1_error)
+  __pyx_tuple__7 = PyTuple_Pack(5, __pyx_n_s_self, __pyx_n_s_data, __pyx_n_s_label, __pyx_n_s_timer, __pyx_n_s_timerData); if (unlikely(!__pyx_tuple__7)) __PYX_ERR(0, 34, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple__7);
   __Pyx_GIVEREF(__pyx_tuple__7);
-  __pyx_codeobj__8 = (PyObject*)__Pyx_PyCode_New(1, 0, 6, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__7, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_timers_pyx, __pyx_n_s_printStats, 24, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__8)) __PYX_ERR(0, 24, __pyx_L1_error)
+  __pyx_codeobj__8 = (PyObject*)__Pyx_PyCode_New(1, 0, 5, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__7, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_timers_pyx, __pyx_n_s_printStats, 34, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__8)) __PYX_ERR(0, 34, __pyx_L1_error)
   __Pyx_RefNannyFinishContext();
   return 0;
   __pyx_L1_error:;
@@ -2648,7 +2619,7 @@ if (!__Pyx_RefNanny) {
   if (__Pyx_init_sys_getdefaultencoding_params() < 0) __PYX_ERR(0, 1, __pyx_L1_error)
   #endif
   if (__pyx_module_is_main_timers) {
-    if (PyObject_SetAttr(__pyx_m, __pyx_n_s_name_2, __pyx_n_s_main) < 0) __PYX_ERR(0, 1, __pyx_L1_error)
+    if (PyObject_SetAttr(__pyx_m, __pyx_n_s_name, __pyx_n_s_main) < 0) __PYX_ERR(0, 1, __pyx_L1_error)
   }
   #if PY_MAJOR_VERSION >= 3
   {
@@ -2740,7 +2711,7 @@ if (!__Pyx_RefNanny) {
  * 
  * class Timers:             # <<<<<<<<<<<<<<
  * 
- *     def __init__(self):
+ *     STAT_LABELS = [
  */
   __pyx_t_2 = __Pyx_Py3MetaclassPrepare((PyObject *) NULL, __pyx_empty_tuple, __pyx_n_s_Timers, __pyx_n_s_Timers, (PyObject *) NULL, __pyx_n_s_timers, (PyObject *) NULL); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 5, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
@@ -2748,49 +2719,82 @@ if (!__Pyx_RefNanny) {
   /* "timers.pyx":7
  * class Timers:
  * 
+ *     STAT_LABELS = [             # <<<<<<<<<<<<<<
+ *         'name',
+ *         'mean',
+ */
+  __pyx_t_1 = PyList_New(7); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 7, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_1);
+  __Pyx_INCREF(__pyx_n_s_name_2);
+  __Pyx_GIVEREF(__pyx_n_s_name_2);
+  PyList_SET_ITEM(__pyx_t_1, 0, __pyx_n_s_name_2);
+  __Pyx_INCREF(__pyx_n_s_mean);
+  __Pyx_GIVEREF(__pyx_n_s_mean);
+  PyList_SET_ITEM(__pyx_t_1, 1, __pyx_n_s_mean);
+  __Pyx_INCREF(__pyx_n_s_median);
+  __Pyx_GIVEREF(__pyx_n_s_median);
+  PyList_SET_ITEM(__pyx_t_1, 2, __pyx_n_s_median);
+  __Pyx_INCREF(__pyx_n_s_min);
+  __Pyx_GIVEREF(__pyx_n_s_min);
+  PyList_SET_ITEM(__pyx_t_1, 3, __pyx_n_s_min);
+  __Pyx_INCREF(__pyx_n_s_max);
+  __Pyx_GIVEREF(__pyx_n_s_max);
+  PyList_SET_ITEM(__pyx_t_1, 4, __pyx_n_s_max);
+  __Pyx_INCREF(__pyx_kp_s_5_low);
+  __Pyx_GIVEREF(__pyx_kp_s_5_low);
+  PyList_SET_ITEM(__pyx_t_1, 5, __pyx_kp_s_5_low);
+  __Pyx_INCREF(__pyx_kp_s_5_high);
+  __Pyx_GIVEREF(__pyx_kp_s_5_high);
+  PyList_SET_ITEM(__pyx_t_1, 6, __pyx_kp_s_5_high);
+  if (__Pyx_SetNameInClass(__pyx_t_2, __pyx_n_s_STAT_LABELS, __pyx_t_1) < 0) __PYX_ERR(0, 7, __pyx_L1_error)
+  __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+
+  /* "timers.pyx":17
+ *     ]
+ * 
  *     def __init__(self):             # <<<<<<<<<<<<<<
  *         self.timers = OrderedDict()
  * 
  */
-  __pyx_t_1 = __Pyx_CyFunction_New(&__pyx_mdef_6timers_6Timers_1__init__, 0, __pyx_n_s_Timers___init, NULL, __pyx_n_s_timers, __pyx_d, ((PyObject *)__pyx_codeobj__2)); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 7, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_CyFunction_New(&__pyx_mdef_6timers_6Timers_1__init__, 0, __pyx_n_s_Timers___init, NULL, __pyx_n_s_timers, __pyx_d, ((PyObject *)__pyx_codeobj__2)); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 17, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  if (__Pyx_SetNameInClass(__pyx_t_2, __pyx_n_s_init, __pyx_t_1) < 0) __PYX_ERR(0, 7, __pyx_L1_error)
+  if (__Pyx_SetNameInClass(__pyx_t_2, __pyx_n_s_init, __pyx_t_1) < 0) __PYX_ERR(0, 17, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-  /* "timers.pyx":10
+  /* "timers.pyx":20
  *         self.timers = OrderedDict()
  * 
  *     def start(self,label):             # <<<<<<<<<<<<<<
  *         if label not in self.timers:
  *             self.timers[label] = Timer(label)
  */
-  __pyx_t_1 = __Pyx_CyFunction_New(&__pyx_mdef_6timers_6Timers_3start, 0, __pyx_n_s_Timers_start, NULL, __pyx_n_s_timers, __pyx_d, ((PyObject *)__pyx_codeobj__4)); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 10, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_CyFunction_New(&__pyx_mdef_6timers_6Timers_3start, 0, __pyx_n_s_Timers_start, NULL, __pyx_n_s_timers, __pyx_d, ((PyObject *)__pyx_codeobj__4)); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 20, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  if (__Pyx_SetNameInClass(__pyx_t_2, __pyx_n_s_start, __pyx_t_1) < 0) __PYX_ERR(0, 10, __pyx_L1_error)
+  if (__Pyx_SetNameInClass(__pyx_t_2, __pyx_n_s_start, __pyx_t_1) < 0) __PYX_ERR(0, 20, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-  /* "timers.pyx":16
+  /* "timers.pyx":26
  *         self.timers[label].start()
  * 
  *     def stop(self,label):             # <<<<<<<<<<<<<<
  *         if label not in self.timers:
  *             raise RuntimeError(
  */
-  __pyx_t_1 = __Pyx_CyFunction_New(&__pyx_mdef_6timers_6Timers_5stop, 0, __pyx_n_s_Timers_stop, NULL, __pyx_n_s_timers, __pyx_d, ((PyObject *)__pyx_codeobj__6)); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 16, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_CyFunction_New(&__pyx_mdef_6timers_6Timers_5stop, 0, __pyx_n_s_Timers_stop, NULL, __pyx_n_s_timers, __pyx_d, ((PyObject *)__pyx_codeobj__6)); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 26, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  if (__Pyx_SetNameInClass(__pyx_t_2, __pyx_n_s_stop, __pyx_t_1) < 0) __PYX_ERR(0, 16, __pyx_L1_error)
+  if (__Pyx_SetNameInClass(__pyx_t_2, __pyx_n_s_stop, __pyx_t_1) < 0) __PYX_ERR(0, 26, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-  /* "timers.pyx":24
+  /* "timers.pyx":34
  *         self.timers[label].stop()
  * 
  *     def printStats(self):             # <<<<<<<<<<<<<<
  *         # collect data
- *         header = [
+ *         data = []
  */
-  __pyx_t_1 = __Pyx_CyFunction_New(&__pyx_mdef_6timers_6Timers_7printStats, 0, __pyx_n_s_Timers_printStats, NULL, __pyx_n_s_timers, __pyx_d, ((PyObject *)__pyx_codeobj__8)); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 24, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_CyFunction_New(&__pyx_mdef_6timers_6Timers_7printStats, 0, __pyx_n_s_Timers_printStats, NULL, __pyx_n_s_timers, __pyx_d, ((PyObject *)__pyx_codeobj__8)); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 34, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  if (__Pyx_SetNameInClass(__pyx_t_2, __pyx_n_s_printStats, __pyx_t_1) < 0) __PYX_ERR(0, 24, __pyx_L1_error)
+  if (__Pyx_SetNameInClass(__pyx_t_2, __pyx_n_s_printStats, __pyx_t_1) < 0) __PYX_ERR(0, 34, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
   /* "timers.pyx":5
@@ -2798,7 +2802,7 @@ if (!__Pyx_RefNanny) {
  * 
  * class Timers:             # <<<<<<<<<<<<<<
  * 
- *     def __init__(self):
+ *     STAT_LABELS = [
  */
   __pyx_t_1 = __Pyx_Py3ClassCreate(((PyObject*)&__Pyx_DefaultClassType), __pyx_n_s_Timers, __pyx_empty_tuple, __pyx_t_2, NULL, 0, 1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 5, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);

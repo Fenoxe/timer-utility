@@ -4,6 +4,16 @@ from tabulate import tabulate
 
 class Timers:
 
+    STAT_LABELS = [  
+        'name',
+        'mean',
+        'median',
+        'min',
+        'max',
+        '5% low',
+        '5% high',
+    ]
+
     def __init__(self):
         self.timers = OrderedDict()
 
@@ -23,20 +33,11 @@ class Timers:
     
     def printStats(self):
         # collect data
-        header = [
-            'name',
-            'mean',
-            'median',
-            'min',
-            'max',
-            '5% low',
-            '5% high'
-        ]
         data = []
         for label,timer in self.timers.items():
             timerData = [label] + list(timer.getStats())
             data.append(timerData)
 
         # !! praise the tabulate library author !!
-        print(tabulate(data,headers=header,tablefmt='github'))
+        print(tabulate(data,headers=Timers.STAT_LABELS,tablefmt='github'))
         
