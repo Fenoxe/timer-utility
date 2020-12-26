@@ -1,8 +1,8 @@
 ## Simple Loop-Friendly Profiling Utility
 
-## Interface
+### Interface
 
-timers - manager for multiple timer classes
+timers (class) - manager for multiple timer classes
 
 ```python
 timers = Timers()
