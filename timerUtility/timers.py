@@ -18,16 +18,32 @@ class Timers:
         '5% high',
     ]
 
-    def __init__(self, raiseErrors: bool = False):
+    def __init__(self, raiseErrors: bool = False, profilerLoop: list[str] = []):
         self.timers = OrderedDict()
         self.raiseErrors: bool = raiseErrors
+
+        if len(profilerLoop) > 0:
+            self.profilerLoop = profilerLoop
+            self.currProfileI = -1
+            for name in self.profilerLoop:
+                self.create(name)
 
     def print(self, s):
         print(f'[Timers] {s}')
 
+    def create(self, name):
+        if name in self.timers:
+            errstr = f'timer with name {name} already exists'
+            if self.raiseErrors:
+                raise RuntimeError(errstr)
+            else:
+                self.print(errstr)
+        
+        self.timers[name] = Timer(name, raiseErrors=self.raiseErrors)
+
     def start(self, name):
         if name not in self.timers:
-            self.timers[name] = Timer(name, raiseErrors=self.raiseErrors)
+            self.create(name)
 
         self.timers[name].start()
 
@@ -40,6 +56,20 @@ class Timers:
                 self.print(errstr)
 
         self.timers[name].stop()
+
+    def profilerBreak(self):
+        if len(self.profilerLoop) == 0:
+            errstr = f'attempted to use profilerBreak without initializing profiler loop'
+            if self.raiseErrors:
+                raise RuntimeError(errstr)
+            else:
+                self.print(errstr)
+        
+        if self.currProfileI >= 0:
+            self.stop(self.profilerLoop[self.currProfileI])
+        self.currProfileI = (self.currProfileI + 1) % len(self.profilerLoop)
+        self.start(self.profilerLoop[self.currProfileI])
+        
     
     def printStats(self):
         # collect data
