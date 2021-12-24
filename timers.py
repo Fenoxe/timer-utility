@@ -4,7 +4,7 @@ from tabulate import tabulate
 
 class Timers:
 
-    STAT_LABELS = [  
+    STAT_LABELS = [
         'name',
         'mean',
         'median',
@@ -22,21 +22,21 @@ class Timers:
     def print(self, s):
         print(f'[Timers] {s}')
 
-    def start(self,label):
-        if label not in self.timers:
-            self.timers[label] = Timer(label, raiseErrors=self.raiseErrors)
+    def start(self, name):
+        if name not in self.timers:
+            self.timers[name] = Timer(name, raiseErrors=self.raiseErrors)
 
-        self.timers[label].start()
+        self.timers[name].start()
 
-    def stop(self,label):
-        if label not in self.timers:
-            errstr = f'timer with label {label} does not exist'
+    def stop(self, name):
+        if name not in self.timers:
+            errstr = f'timer with name {name} does not exist'
             if self.raiseErrors:
                 raise RuntimeError(errstr)
             else:
                 self.print(errstr)
 
-        self.timers[label].stop()
+        self.timers[name].stop()
     
     def printStats(self):
         # collect data
@@ -48,4 +48,5 @@ class Timers:
         # !! praise the tabulate library author !!
         print(tabulate(data,headers=Timers.STAT_LABELS,tablefmt='github'))
         
-        
+    def getTimes(self):
+        return { timerName: timer.history for timerName,timer in self.timers.items() }
