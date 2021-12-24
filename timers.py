@@ -8,6 +8,7 @@ class Timers:
         'name',
         'mean',
         'median',
+        'stddev',
         'min',
         'max',
         '5% low',
@@ -40,4 +41,5 @@ class Timers:
 
         # !! praise the tabulate library author !!
         print(tabulate(data,headers=Timers.STAT_LABELS,tablefmt='github'))
+        
         
