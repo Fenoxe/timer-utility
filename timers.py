@@ -15,20 +15,26 @@ class Timers:
         '5% high',
     ]
 
-    def __init__(self):
+    def __init__(self, raiseErrors: bool = False):
         self.timers = OrderedDict()
+        self.raiseErrors: bool = raiseErrors
+
+    def print(self, s):
+        print(f'[Timers] {s}')
 
     def start(self,label):
         if label not in self.timers:
-            self.timers[label] = Timer(label)
+            self.timers[label] = Timer(label, raiseErrors=self.raiseErrors)
 
         self.timers[label].start()
 
     def stop(self,label):
         if label not in self.timers:
-            raise RuntimeError(
-                f'timer with label {label} does not exist'
-            )
+            errstr = f'timer with label {label} does not exist'
+            if self.raiseErrors:
+                raise RuntimeError(errstr)
+            else:
+                self.print(errstr)
 
         self.timers[label].stop()
     
