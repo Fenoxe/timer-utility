@@ -1,6 +1,6 @@
 from time import time_ns
+from statistics import pstdev
 
-from math import stddev
 
 class Timer:
 
@@ -44,11 +44,11 @@ class Timer:
 
         mean = sum(sortedHistory) / len(sortedHistory)
         median = sortedHistory[len(sortedHistory) // 2]
-        std = stddev(sortedHistory)
+        stddev = pstdev(sortedHistory)
         mini = min(sortedHistory)
         maxi = max(sortedHistory)
         fivePercLow = sortedHistory[len(sortedHistory) // 20]
         fivePercHigh = sortedHistory[(len(sortedHistory) // 20) * 19]
 
-        return (mean,median,std,mini,maxi,fivePercLow,fivePercHigh)
+        return (mean,median,stddev,mini,maxi,fivePercLow,fivePercHigh)
         

@@ -1,6 +1,9 @@
-from timer import Timer
 from collections import OrderedDict
+
 from tabulate import tabulate
+
+from .timer import Timer
+
 
 class Timers:
 
