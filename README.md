@@ -1,4 +1,4 @@
-## Simple Loop-Friendly Profiling Utility
+## Insanely Simple Loop-Friendly Profiling Utility
 
 ### Interface
 
